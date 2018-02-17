@@ -1,4 +1,4 @@
-from flask import jsonify, Flask
+from flask import jsonify, Flask, g
 from flask_graphql import GraphQLView
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def close_db(error):
     connection.close()
 
 
-app.add_url_rule('/', 'home', lambda: jsonify({'response': 'ok', 'message': 'hey, patrick\'s data warehouse'}))
+app.add_url_rule('/', 'home', lambda: jsonify({'response': 'ok', 'message': 'hey, mountain madness hackathon'}))
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000)
