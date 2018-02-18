@@ -47,7 +47,7 @@ def get_db(db_name: str):
 
 class WeatherDB:
   def __init__(self):
-    self._TABLE = 'hackathon'
+    self._TABLE = 'weather'
     self._TEMP = 'temp'
     self._HUMIDITY = 'humidity'
     self._DB_NAME = 'iot_data'
