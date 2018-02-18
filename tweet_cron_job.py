@@ -29,19 +29,27 @@ def assemble_image_request(image_uri) -> dict:
       },
       'features': [
         {
-          'type': 'IMAGE_PROPERTIES'
-        }, {
-          'type': 'LABEL_DETECTION'
+          'type': 'LABEL_DETECTION',
+          'maxResults': 8
         }
       ]
     }]
   }
 
 
+def clean_data(photo_annotation: list) -> List[Dict[str, float]]:
+  score_list = [x['score'] for x in photo_annotation]
+  max_score = max(score_list)
+  min_score = min(score_list)
+  distance = max_score - min_score
+  selected_values = [{'desc': x['description'], 'score': (x['score'] - min_score) / distance} for x in photo_annotation]
+  return selected_values
+
+
 def image_annotation_text(image_uri: str):
   image_request_json = assemble_image_request(image_uri)
   response = requests.post(GOOGLE_API_ENDPOINT, json=image_request_json).content.decode('utf-8')
-  return json.loads(response)['responses'][0]
+  return json.loads(response)['responses'][0]['labelAnnotations']
 
 
 def save_a_photo_to_disk(image_uri: str, file_name: str):
@@ -55,7 +63,8 @@ def get_a_photo_from_camera() -> str:
   image_url = CAMERA_POOL[random.randrange(0, 6)]
   save_a_photo_to_disk(image_url, time_string)
   photo_annotation = image_annotation_text(image_url)
-  print(photo_annotation)
+  cleaned_annotation = clean_data(photo_annotation)
+  print(cleaned_annotation)
   return f'./photos/{time_string}.jpg'
 
 

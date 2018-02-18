@@ -1,6 +1,5 @@
 import tweepy
 from config import TWITTER
-from flask import jsonify
 
 
 def get_api():
