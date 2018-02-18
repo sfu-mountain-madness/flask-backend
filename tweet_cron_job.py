@@ -1,11 +1,12 @@
 import TwitterHandler
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import requests
 import time
 import shutil
 import json
 import random
 from config import GOOGLE_API_KEY
+from PIL import Image, ImageFont, ImageDraw
 
 CAMERA_POOL: List[str] = [
   'http://ns-webcams.its.sfu.ca/public/images/udn-current.jpg',
@@ -86,6 +87,15 @@ def send_a_photo():
     filename,
     f"Mountain real-time status - temperature: {temp_hum['temperature']}°C, humidity: { temp_hum['humidity']}%"
   )
+
+
+def add_text_to_photo(filename: str, text: str,
+                      location=(0, 0), color=(0, 0, 0), font_size=16):
+  with Image.open("sample_in.jpg") as img:
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("./fonts/Verdana.ttf", font_size)
+    draw.text(location, text, color, font=font)
+    img.save(filename)
 
 
 if __name__ == '__main__':
