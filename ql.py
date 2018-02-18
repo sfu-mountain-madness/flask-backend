@@ -1,4 +1,5 @@
 import graphene
+import TwitterHandler
 from db_connection import WeatherDB
 
 
@@ -8,7 +9,7 @@ class WeatherData(graphene.ObjectType):
   date = graphene.String(required=False)
 
 class TweetsId(graphene.ObjectType):
-  id = graphene.Int()
+  id = graphene.String()
 
 class Query(graphene.ObjectType):
   weather = graphene.List(WeatherData, limit=graphene.Int())
@@ -21,8 +22,10 @@ class Query(graphene.ObjectType):
     rv = list(map(lambda x: WeatherData(temp=x[1], humidity=x[2], date=x[3]), weather_data_list))
     return rv
 
-  # def resolve_tweets_id(self, info, limit):
-
+  def resolve_tweets_id(self, info, limit):
+    tweets_id_list = TwitterHandler.get_tweets_list()
+    limit = min(limit, len(tweets_id_list))
+    return list(map(lambda x: TweetsId(id=x), tweets_id_list[0:limit]))
 
   def resolve_hello(self, info):
     return 'World'

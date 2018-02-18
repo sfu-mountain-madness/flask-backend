@@ -21,14 +21,10 @@ def post_with_images(filename: str, status: str):
   status = api.update_with_media(filename, status)
 
 
-def id_check():
+def get_tweets_list():
   api = get_api()
-  public_tweets = api.home_timeline()
-  print(public_tweets[0])
-  api_list = []
+  public_tweets = api.home_timeline(count=5, exclude_replies=True, trim_user=True)
+  id_list = []
   for data in public_tweets:
-    id_dict = {}
-    id_dict['id'] = data._json['id']
-    api_list.append(id_dict)
-  
-  return jsonify({'response': 'ok', 'data': api_list})
+    id_list.append(data._json['id_str'])
+  return id_list
