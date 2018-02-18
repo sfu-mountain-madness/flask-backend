@@ -80,7 +80,7 @@ def edit_photo(filename: str, labels: List[Dict[str, object]], weather: Dict[str
   column_sep = font_size
   row_sep = font_size
   
-  text_area_width = 2 * max([len(x['label']) for x in labels]) * font_size + 3 * column_sep
+  text_area_width = 2 * max([len(x['label']) for x in labels]) * font_size * 0.8 + 3 * column_sep
   row_num = (len(labels) + 1) // 2
   text_area_height = (row_num + 1) * row_sep + row_num * font_size
   

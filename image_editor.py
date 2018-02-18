@@ -56,12 +56,11 @@ def add_weather_to_photo(filename: str, weather_info: Dict[str, float], raw_loca
 def add_labels_to_photo(filename: str, labels: List[Dict[str, object]], 
                         font_size:int, column_sep: int, row_sep: int):
   row_num = (len(labels) + 1) // 2
-  max_word_width = max([len(x['label']) for x in labels]) * font_size
-  rect_width = 2 * max_word_width + column_sep * 3
+  max_word_width = max([len(x['label']) for x in labels]) * font_size * 0.8
 
   with Image.open(filename) as img:
     location_y = 0
-    location_x = img.size[0] - rect_width
+    location_x = img.size[0] * 0.1
 
     i = 0
     content_left = location_x + column_sep
