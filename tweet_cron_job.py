@@ -86,9 +86,9 @@ def edit_photo(filename: str, labels: List[Dict[str, object]], weather: Dict[str
   
   # print(text_area_width, text_area_height)
   
-  image_editor.add_rectangle_to_photo(filename, (-text_area_width, 0))
+  # image_editor.add_rectangle_to_photo(filename, (-text_area_width, 0))
   image_editor.add_labels_to_photo(filename, labels, font_size, column_sep, row_sep)
-  image_editor.add_weather_to_photo(filename, weather, (-text_area_width + column_sep, text_area_height))
+  image_editor.add_weather_to_photo(filename, weather, (-text_area_width + column_sep, text_area_height + row_sep))
 
 
 def send_a_photo():

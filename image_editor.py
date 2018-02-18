@@ -33,9 +33,6 @@ def add_rectangle_to_photo(filename: str, raw_left_top: Tuple[int, int],
     else:
       right_bottom = raw_location_to_absolute(raw_right_bottom, width, height)
 
-    print(left_top)
-    print(right_bottom)
-
     add_rectangle_to_img(img, left_top, right_bottom, color)
     img.save(filename)
 
@@ -47,9 +44,9 @@ def add_weather_to_photo(filename: str, weather_info: Dict[str, float], raw_loca
 
     for k, v in weather_info.items():
       str_to_write = k + ' ' + str(v)
-      if k == 'hum':
+      if k == 'humidity':
         str_to_write += '%'
-      elif k == 'temp':
+      elif k == 'temperature':
         str_to_write += '°'
       add_text_to_img(img, str_to_write , location=(location_x, location_y), color=color, font_size=font_size)
       location_y += font_size
