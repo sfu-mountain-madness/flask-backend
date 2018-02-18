@@ -6,7 +6,7 @@ from flask import jsonify
 def get_api():
   auth = tweepy.OAuthHandler(TWITTER['consumer_key'], TWITTER['consumer_secret'])
   auth.set_access_token(TWITTER['access_token'], TWITTER['access_token_secret'])
-
+  
   return tweepy.API(auth)
 
 
@@ -16,9 +16,9 @@ def post_message(message: str, long: int, lat: int, place_id=None):
   print(status)
 
 
-def post_with_images():
+def post_with_images(filename: str, status: str):
   api = get_api()
-  status = api.update_with_media("./images/rainbow.jpg")
+  status = api.update_with_media(filename, status)
 
 
 def id_check():
@@ -30,5 +30,5 @@ def id_check():
     id_dict = {}
     id_dict['id'] = data._json['id']
     api_list.append(id_dict)
-
+  
   return jsonify({'response': 'ok', 'data': api_list})

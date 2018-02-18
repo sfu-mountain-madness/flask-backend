@@ -8,7 +8,6 @@ from ql import schema
 app = Flask(__name__)
 
 
-
 @app.teardown_appcontext
 def close_db(error):
   if not hasattr(g, 'db_list'):
