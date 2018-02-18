@@ -1,6 +1,7 @@
 import pymysql
 from config import MYSQL_CONFIG
 from flask import g
+#from graphql import schema
 
 
 class Connection:
