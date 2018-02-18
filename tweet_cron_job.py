@@ -30,7 +30,7 @@ def assemble_image_request(image_uri) -> dict:
       'features': [
         {
           'type': 'LABEL_DETECTION',
-          'maxResults': 8
+          'maxResults': 10
         }
       ]
     }]
@@ -42,7 +42,7 @@ def clean_data(photo_annotation: list) -> List[Dict[str, float]]:
   max_score = max(score_list)
   min_score = min(score_list)
   distance = max_score - min_score
-  selected_values = [{'desc': x['description'], 'score': (x['score'] - min_score) / distance} for x in photo_annotation]
+  selected_values = [{'label': x['description'], 'score': (x['score'] - min_score) / distance} for x in photo_annotation]
   return selected_values
 
 
