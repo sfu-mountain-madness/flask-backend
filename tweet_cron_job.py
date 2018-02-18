@@ -29,24 +29,9 @@ def assemble_image_request(image_uri) -> dict:
       },
       'features': [
         {
-          'type': 'LANDMARK_DETECTION',
-          'maxResults': 1
-        },
-        {
-          'type': 'WEB_DETECTION',
-          'maxResults': 5
-        }, {
           'type': 'IMAGE_PROPERTIES'
         }, {
           'type': 'LABEL_DETECTION'
-        }, {
-          'type': 'FACE_DETECTION'
-        }, {
-          'type': 'LOGO_DETECTION'
-        }, {
-          'type': 'TEXT_DETECTION'
-        }, {
-          'type': 'DOCUMENT_TEXT_DETECTION'
         }
       ]
     }]
@@ -56,7 +41,7 @@ def assemble_image_request(image_uri) -> dict:
 def image_annotation_text(image_uri: str):
   image_request_json = assemble_image_request(image_uri)
   response = requests.post(GOOGLE_API_ENDPOINT, json=image_request_json).content.decode('utf-8')
-  return json.loads(response)
+  return json.loads(response)['responses'][0]
 
 
 def save_a_photo_to_disk(image_uri: str, file_name: str):
@@ -69,8 +54,8 @@ def get_a_photo_from_camera() -> str:
   time_string = str(time.time()).split(".")[0]
   image_url = CAMERA_POOL[random.randrange(0, 6)]
   save_a_photo_to_disk(image_url, time_string)
-  ai_result = image_annotation_text(image_url)
-  print(ai_result)
+  photo_annotation = image_annotation_text(image_url)
+  print(photo_annotation)
   return f'./photos/{time_string}.jpg'
 
 
