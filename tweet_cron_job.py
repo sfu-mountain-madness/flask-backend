@@ -42,7 +42,8 @@ def clean_data(photo_annotation: list) -> List[Dict[str, float]]:
   max_score = max(score_list)
   min_score = min(score_list)
   distance = max_score - min_score
-  selected_values = [{'label': x['description'], 'score': (x['score'] - min_score) / distance} for x in photo_annotation]
+  selected_values = [{'label': x['description'], 'score': (x['score'] - min_score) / distance} for x in
+                     photo_annotation]
   return selected_values
 
 
@@ -65,7 +66,7 @@ def get_a_photo_from_camera() -> str:
   photo_annotation = image_annotation_text(image_url)
   cleaned_annotation = clean_data(photo_annotation)
   
-  return f'./photos/{time_string}.jpg'
+  return f'./photos/{time_string}.jpg', cleaned_annotation
 
 
 def get_weather_from_sensor() -> Dict[str, float]:
@@ -73,26 +74,27 @@ def get_weather_from_sensor() -> Dict[str, float]:
   rv_json = json.loads(rv)['weather'][0]
   return {"humidity": rv_json['humidity'], "temperature": rv_json['temp']}
 
-def edit_photo(filename: str, labels: List[Dict[str, object]], weather: List[Dict[str, float]]):
-  font_size = 24
 
+def edit_photo(filename: str, labels: List[Dict[str, object]], weather: Dict[str, float]):
+  font_size = 24
   column_sep = font_size
   row_sep = font_size
-
+  
   text_area_width = 2 * max([len(x['label']) for x in labels]) * font_size + 3 * column_sep
   row_num = (len(labels) + 1) // 2
-  text_area_height = (row_num + 1)  * row_sep + row_num * font_size
-
-  print(text_area_width, text_area_height)
-
+  text_area_height = (row_num + 1) * row_sep + row_num * font_size
+  
+  # print(text_area_width, text_area_height)
+  
   image_editor.add_rectangle_to_photo(filename, (-text_area_width, 0))
   image_editor.add_labels_to_photo(filename, labels, font_size, column_sep, row_sep)
-  image_editor.add_weather_to_photo(filename, weather, (-text_area_width+column_sep, text_area_height))
+  image_editor.add_weather_to_photo(filename, weather, (-text_area_width + column_sep, text_area_height))
 
 
 def send_a_photo():
-  filename = get_a_photo_from_camera()
+  filename, cleaned_annotation = get_a_photo_from_camera()
   temp_hum = get_weather_from_sensor()
+  edit_photo(filename, cleaned_annotation, temp_hum)
   TwitterHandler.post_with_images(
     filename,
     f"Mountain real-time status - temperature: {temp_hum['temperature']}°C, humidity: { temp_hum['humidity']}%"
@@ -100,52 +102,4 @@ def send_a_photo():
 
 
 if __name__ == '__main__':
-  filename = 'test.jpg'
-  weather = {
-    'hum': 20.0,
-    'temp': 20.0,
-  }
-  labels = [
-    {
-      'label': 'hhhh',
-      'score': 1.0
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.9
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.8
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.7
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.6
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.5
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.4
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.3
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.2
-    },
-    {
-      'label': 'hhhh',
-      'score': 0.1
-    },
-  ]
-  edit_photo(filename, labels, weather)
-
+  send_a_photo()
