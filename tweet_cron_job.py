@@ -5,6 +5,7 @@ import time
 import shutil
 import json
 import random
+from PIL import Image, ImageFont, ImageDraw
 
 CAMERA_POOL: List[str] = [
   'http://ns-webcams.its.sfu.ca/public/images/udn-current.jpg',
@@ -38,6 +39,16 @@ def send_a_photo():
     filename,
     f"Mountain real-time status - temperature: {temp_hum['temperature']}°C, humidity: { temp_hum['humidity']}%"
   )
+
+def add_text_to_photo(filename: str, text: str, 
+                      location=(0, 0): Tuple[int, int], 
+                      color=(0, 0, 0): Tuple[int, int, int],
+                      fontSize=16: int):
+  with Image.open("sample_in.jpg") as img:
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("./fonts/Verdana.ttf", fontSize)
+    draw.text(location, text, color, font=font)
+    img.save(filename)
 
 
 if __name__ == '__main__':
