@@ -1,12 +1,12 @@
 import TwitterHandler
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import requests
 import time
 import shutil
 import json
 import random
+import image_editor
 from config import GOOGLE_API_KEY
-from PIL import Image, ImageFont, ImageDraw
 
 CAMERA_POOL: List[str] = [
   'http://ns-webcams.its.sfu.ca/public/images/udn-current.jpg',
@@ -64,7 +64,7 @@ def get_a_photo_from_camera() -> str:
   save_a_photo_to_disk(image_url, time_string)
   photo_annotation = image_annotation_text(image_url)
   cleaned_annotation = clean_data(photo_annotation)
-  print(cleaned_annotation)
+  
   return f'./photos/{time_string}.jpg'
 
 
@@ -72,6 +72,22 @@ def get_weather_from_sensor() -> Dict[str, float]:
   rv = requests.get('https://backend.haoxp.xyz/weather?limit=1').content.decode()
   rv_json = json.loads(rv)['weather'][0]
   return {"humidity": rv_json['humidity'], "temperature": rv_json['temp']}
+
+def edit_photo(filename: str, labels: List[Dict[str, object]], weather: List[Dict[str, float]]):
+  font_size = 24
+
+  column_sep = font_size
+  row_sep = font_size
+
+  text_area_width = 2 * max([len(x['label']) for x in labels]) * font_size + 3 * column_sep
+  row_num = (len(labels) + 1) // 2
+  text_area_height = (row_num + 1)  * row_sep + row_num * font_size
+
+  print(text_area_width, text_area_height)
+
+  image_editor.add_rectangle_to_photo(filename, (-text_area_width, 0))
+  image_editor.add_labels_to_photo(filename, labels, font_size, column_sep, row_sep)
+  image_editor.add_weather_to_photo(filename, weather, (-text_area_width+column_sep, text_area_height))
 
 
 def send_a_photo():
@@ -83,14 +99,53 @@ def send_a_photo():
   )
 
 
-def add_text_to_photo(filename: str, text: str,
-                      location=(0, 0), color=(0, 0, 0), font_size=16):
-  with Image.open("sample_in.jpg") as img:
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("./fonts/Verdana.ttf", font_size)
-    draw.text(location, text, color, font=font)
-    img.save(filename)
-
-
 if __name__ == '__main__':
-  send_a_photo()
+  filename = 'test.jpg'
+  weather = {
+    'hum': 20.0,
+    'temp': 20.0,
+  }
+  labels = [
+    {
+      'label': 'hhhh',
+      'score': 1.0
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.9
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.8
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.7
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.6
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.5
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.4
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.3
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.2
+    },
+    {
+      'label': 'hhhh',
+      'score': 0.1
+    },
+  ]
+  edit_photo(filename, labels, weather)
+
