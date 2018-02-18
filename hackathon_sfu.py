@@ -1,8 +1,9 @@
 from flask import jsonify, Flask, g, request
-from flask_graphql import GraphQLView
+# from flask_graphql import GraphQLView
 
 from db_connection import WeatherDB
-from graphql import schema
+# from graphql import schema
+from TwitterHandler import id_check
 
 app = Flask(__name__)
 
@@ -44,6 +45,8 @@ def handle_weather():
 
 app.add_url_rule('/', 'home', lambda: jsonify({'response': 'ok', 'message': 'hey, mountain madness hackathon'}))
 app.add_url_rule('/weather', 'weather', handle_weather, methods=['GET', 'POST'])
-app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
+
+app.add_url_rule('/check', 'check', id_check)
+# app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5001)
