@@ -1,5 +1,5 @@
 import TwitterHandler
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import requests
 import time
 import shutil
@@ -19,7 +19,7 @@ CAMERA_POOL: List[str] = [
 GOOGLE_API_ENDPOINT = f'https://vision.googleapis.com/v1/images:annotate?key={GOOGLE_API_KEY}'
 
 
-def assemble_image_request(image_uri) -> dict:
+def assemble_image_request(image_uri: str) -> dict:
   return {
     'requests': [{
       'image': {
@@ -37,7 +37,7 @@ def assemble_image_request(image_uri) -> dict:
   }
 
 
-def clean_data(photo_annotation: list) -> List[Dict[str, float]]:
+def normalize_desc_score(photo_annotation: list) -> List[Dict[str, float]]:
   score_list = [x['score'] for x in photo_annotation]
   max_score = max(score_list)
   min_score = min(score_list)
@@ -47,26 +47,25 @@ def clean_data(photo_annotation: list) -> List[Dict[str, float]]:
   return selected_values
 
 
-def image_annotation_text(image_uri: str):
+def get_image_annotation(image_uri: str):
   image_request_json = assemble_image_request(image_uri)
   response = requests.post(GOOGLE_API_ENDPOINT, json=image_request_json).content.decode('utf-8')
   return json.loads(response)['responses'][0]['labelAnnotations']
 
 
-def save_a_photo_to_disk(image_uri: str, file_name: str):
+def download_image(image_uri: str, file_name: str):
   response = requests.get(image_uri, stream=True)
   with open(f'./photos/{file_name}.jpg', 'wb') as f:
     shutil.copyfileobj(response.raw, f)
 
 
-def get_a_photo_from_camera() -> str:
+def get_photo_with_info_from_camera() -> Tuple[str, List[Dict[str, float]]]:
   time_string = str(time.time()).split(".")[0]
   image_url = CAMERA_POOL[random.randrange(0, 6)]
-  save_a_photo_to_disk(image_url, time_string)
-  photo_annotation = image_annotation_text(image_url)
-  cleaned_annotation = clean_data(photo_annotation)
-  
-  return f'./photos/{time_string}.jpg', cleaned_annotation
+  download_image(image_url, time_string)
+  photo_annotation = get_image_annotation(image_url)
+  normalized_scores = normalize_desc_score(photo_annotation)
+  return f'./photos/{time_string}.jpg', normalized_scores
 
 
 def get_weather_from_sensor() -> Dict[str, float]:
@@ -92,7 +91,7 @@ def edit_photo(filename: str, labels: List[Dict[str, object]], weather: Dict[str
 
 
 def send_a_photo():
-  filename, cleaned_annotation = get_a_photo_from_camera()
+  filename, cleaned_annotation = get_photo_with_info_from_camera()
   temp_hum = get_weather_from_sensor()
   edit_photo(filename, cleaned_annotation, temp_hum)
   TwitterHandler.post_with_images(
